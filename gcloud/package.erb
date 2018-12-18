@@ -1,0 +1,30 @@
+<%= include "proto_header" %>
+<%= include "copyright" %>
+
+
+require "grpc"
+<% service.source_dependencies.each do |source_dependency| -%>
+  require "<%= source_dependency.to_ruby_filepath %>"
+<% end %>
+
+<% service.ruby_namespace do %>
+  <% service do |service| %>
+    # Service that implements <% = service.description %>.
+    class Service
+
+      include GRPC::GenericService
+
+      self.marshal_class_method = :encode
+      self.unmarshal_class_method = :decode
+      self.service_name = "<% = service.proto_namespace %>"
+
+      <% service.rpcs.each do |rpc| -%>
+        <%= include "rpc", rpc: rpc %>
+        # <%= rpc.comments %>
+        rpc <%= rpc.name.snake_case %>, <%= rpc.request.name %>, <%= rpc.response.name %>
+      <% end -%>
+    end
+
+    Stub = Service.rpc_stub_class
+  <% end %>
+<% end %>

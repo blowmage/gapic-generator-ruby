@@ -23,6 +23,7 @@ require "google/gax/operation"
 require "google/longrunning/operations_client"
 
 require "google/showcase/v1alpha3/testing_pb"
+require "google/showcase/v1alpha3/testing/path_helpers"
 
 module Google
   module Showcase
@@ -47,6 +48,9 @@ module Google
 
         # Service that implements Google Cloud Speech API.
         class Client
+          include PathHelpers
+          extend PathHelpers
+
           # @private
           attr_reader :testing_stub
 

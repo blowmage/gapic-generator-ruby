@@ -36,6 +36,8 @@ module Google
           use_helpers! :api_presenter
         end
 
+        # rubocop:disable all
+
         # Generates all the files for the API.
         #
         # @return [Array<
@@ -56,6 +58,13 @@ module Google
               files << cop(gen("client.erb",
                                "lib/#{service.client_file_path}",
                                service: service))
+
+              if service.path_helpers?
+                files << cop(gen("client_path_helpers.erb",
+                                 "lib/#{service.path_helpers_file_path}",
+                                 service: service))
+              end
+
               files << cop(gen("client_test.erb",
                                "test/#{service.client_test_file_path}",
                                service: service))
@@ -71,6 +80,8 @@ module Google
 
           files
         end
+
+        # rubocop:enable all
       end
     end
   end

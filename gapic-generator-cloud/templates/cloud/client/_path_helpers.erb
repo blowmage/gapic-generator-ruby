@@ -1,0 +1,9 @@
+<%- assert_locals service -%>
+module PathHelpers
+<%- service.references.each do |name, pattern| -%>
+  def <%= name.underscore %>_path
+    <%= pattern.inspect %>
+  end
+
+<%- end %>
+end

@@ -159,7 +159,7 @@ class ServicePresenter
   end
 
   def helpers_file_path
-    helpers_require(service) + ".rb"
+    helpers_require + ".rb"
   end
 
   def client_test_file_path
@@ -168,6 +168,32 @@ class ServicePresenter
 
   def stub_name
     "#{ActiveSupport::Inflector.underscore name}_stub"
+  end
+
+  def references
+    references ||= begin
+      m = @service.parent.messages.select { |m| m.fields.select(&:resource).any? }
+      pairs = m.map { |m1| [m1.name, m1.fields.map(&:resource).compact.first.pattern] }
+      Hash[pairs]
+    end
+  end
+
+  def path_helpers?
+    references.any?
+  end
+
+  def path_helpers_name
+    "PathHelpers"
+  end
+
+  def path_helpers_require
+    helpers_namespace = @service.address.dup
+    helpers_namespace.push path_helpers_name
+    helpers_namespace.map(&:underscore).join "/"
+  end
+
+  def path_helpers_file_path
+    path_helpers_require + ".rb"
   end
 
   protected

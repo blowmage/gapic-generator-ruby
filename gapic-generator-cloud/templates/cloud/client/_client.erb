@@ -10,6 +10,9 @@ require "google/gax"
 <%- end -%>
 
 require "<%= service.service_proto_require %>"
+<%- if service.path_helpers? -%>
+require "<%= service.path_helpers_require %>"
+<%- end -%>
 <% end %>
 class <%= service.credentials_class_name %> < Google::Auth::Credentials
   SCOPE = [
@@ -30,6 +33,11 @@ end
 
 # Service that implements Google Cloud Speech API.
 class <%= service.client_class_name %>
+<%- if service.path_helpers? -%>
+  include <%= service.path_helpers_name %>
+  extend <%= service.path_helpers_name %>
+
+<%- end -%>
   # @private
   attr_reader :<%= service.stub_name %>
 

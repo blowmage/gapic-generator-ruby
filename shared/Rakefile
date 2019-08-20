@@ -131,7 +131,8 @@ def generate_input_file service, protos, samples = nil  # TODO: support multiple
       "--ruby_gapic_opt=configuration=../shared/config/#{service}.yml",
       "--ruby_gapic_opt=binary_output=./input/#{service}_desc.bin",
     ]
-    protoc_cmd <<  "--ruby_gapic_opt=samples=#{samples}" unless samples.nil?
+    puts "--ruby_gapic_opt=samples=../shared/googleapis/#{samples}" unless samples.nil?
+    protoc_cmd <<  "--ruby_gapic_opt=samples=../shared/googleapis/#{samples}" unless samples.nil?
 
     `#{protoc_cmd.join " "}`
   end

@@ -122,8 +122,13 @@ class MethodPresenter
     ]
   end
 
+  #   rpc: Recognize
+  # service: google.cloud.speech.v1.Speech   service: google.cloud.speech.v1.Speech rpc: Recognize
   def code_example
-    "TODO "
+    raise api.samples.inspect
+    samples = @api.samples.select { |x| x[:service] == @method.address[0...-1].join(".") && x[:rpc] == @method.name }
+    puts "service: #{@method.address[0...-1].join(".")} rpc: #{@method.name}"
+    samples.map { |s| s[:id] }.join "\n"
   end
 
   def lro?

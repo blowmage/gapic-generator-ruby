@@ -58,7 +58,7 @@ module Gapic
     #   argument, and return a formatted resource object. Optional.
     #
     def initialize grpc_stub, method_name, request, response, operation, options,
-                   format_resource: nil, operation_callback: nil
+                   format_resource: nil
       @grpc_stub = grpc_stub
       @method_name = method_name
       @request = request
@@ -66,7 +66,6 @@ module Gapic
       @options = options
       @format_resource = format_resource
       @resource_field = nil # will be set in verify_response!
-      @operation_callback = operation_callback
 
       verify_request!
       verify_response!
@@ -147,7 +146,6 @@ module Gapic
       next_request.page_token = @page.next_page_token
 
       next_operation_callback = lambda do |next_response, next_operation|
-        @operation_callback&.call next_response, next_operation
         @page = Page.new next_response, @resource_field, next_operation, format_resource: @format_resource
       end
       @grpc_stub.call_rpc @method_name, next_request, options: @options, operation_callback: next_operation_callback

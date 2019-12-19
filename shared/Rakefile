@@ -132,26 +132,67 @@ end
 task default: :ci
 
 def generate_input_file service, protos, samples = nil
-  require "tmpdir"
+  FileUtils.rm_rf "output/gems/gapic/#{service}"
+  FileUtils.mkdir_p "output/gems/gapic/#{service}/lib"
 
-  Dir.mktmpdir do |tmp|
-    protoc_cmd = [
-      "bundle exec grpc_tools_ruby_protoc #{Array(protos).join ' '}",
-      "--proto_path=api-common-protos/",
-      "--proto_path=googleapis/",
-      "--proto_path=protos/",
-      "--ruby_gapic_out=#{tmp}",
-      # TODO: invoke a custom runner?
-      # "--ruby_gapic_opt=generator=cloud",
-      # TODO: invoke a custom template path?
-      # "--ruby_gapic_opt=templates=../gapic-generator-cloud/templates",
-      # "--ruby_gapic_opt=gem_name=google-cloud-#{service}",
-      "--ruby_gapic_opt=configuration=../shared/config/#{service}.yml",
-      "--ruby_gapic_opt=binary_output=./input/#{service}_desc.bin"
-    ]
-    # Add optional samples paths
-    protoc_cmd << "--ruby_gapic_opt='samples=#{samples.join ';'}'" if samples
+  protoc_cmd = [
+    "bundle exec grpc_tools_ruby_protoc #{Array(protos).join ' '}",
+    "--proto_path=api-common-protos/",
+    "--proto_path=googleapis/",
+    "--proto_path=protos/",
+    "--ruby_gapic_out=./output/gems/gapic/#{service}",
+    "--ruby_out=./output/gems/gapic/#{service}/lib",
+    "--grpc_out=./output/gems/gapic/#{service}/lib",
+    # TODO: invoke a custom runner?
+    # "--ruby_gapic_opt=generator=cloud",
+    # TODO: invoke a custom template path?
+    # "--ruby_gapic_opt=templates=../gapic-generator-cloud/templates",
+    # "--ruby_gapic_opt=gem_name=google-cloud-#{service}",
+    "--ruby_gapic_opt=configuration=../shared/config/#{service}.yml",
+    "--ruby_gapic_opt=binary_output=./input/#{service}_desc.bin"
+  ]
+  # Add optional samples paths
+  protoc_cmd << "--ruby_gapic_opt='samples=#{samples.join ';'}'" if samples
 
-    `#{protoc_cmd.join " "}`
+  `#{protoc_cmd.join " "}`
+
+  FileUtils.rm_rf "output/gems/cloud/#{service}"
+  FileUtils.mkdir_p "output/gems/cloud/#{service}/lib"
+
+  cloud_cmd = [
+    "bundle exec grpc_tools_ruby_protoc #{Array(protos).join ' '}",
+    "--proto_path=api-common-protos/",
+    "--proto_path=googleapis/",
+    "--proto_path=protos/",
+    "--ruby_gapic_out=./output/gems/cloud/#{service}",
+    "--ruby_out=./output/gems/cloud/#{service}/lib",
+    "--grpc_out=./output/gems/cloud/#{service}/lib",
+    # invoke custom cloud runner
+    "--ruby_gapic_opt=generator=cloud",
+    "--ruby_gapic_opt=configuration=../shared/config/#{service}.yml",
+  ]
+  # Add optional samples paths
+  cloud_cmd << "--ruby_gapic_opt='samples=#{samples.join ';'}'" if samples
+
+  `#{cloud_cmd.join " "}`
+
+  FileUtils.rm_rf "output/gems/ads/#{service}"
+  FileUtils.mkdir_p "output/gems/ads/#{service}/lib"
+
+  ads_cmd = [
+    "bundle exec grpc_tools_ruby_protoc #{Array(protos).join ' '}",
+    "--proto_path=api-common-protos/",
+    "--proto_path=googleapis/",
+    "--proto_path=protos/",
+    "--ruby_gapic_out=./output/gems/ads/#{service}",
+    "--ruby_out=./output/gems/ads/#{service}/lib",
+    "--grpc_out=./output/gems/ads/#{service}/lib",
+    # invoke custom ads runner
+    "--ruby_gapic_opt=generator=ads",
+    "--ruby_gapic_opt=configuration=../shared/config/#{service}.yml",
+  ]
+  # Add optional samples paths
+  ads_cmd << "--ruby_gapic_opt='samples=#{samples.join ';'}'" if samples
+
+  `#{ads_cmd.join " "}`
   end
-end
